@@ -45,11 +45,8 @@ TEST_CASE("query program info", "[netebpfext]")
 {
     netebpf_ext_helper_t helper;
     std::vector<GUID> expected_guids = {
-        EBPF_PROGRAM_TYPE_CGROUP_SOCK_ADDR,
-        EBPF_PROGRAM_TYPE_SOCK_OPS,
-        EBPF_PROGRAM_TYPE_BIND,
-        EBPF_PROGRAM_TYPE_XDP_TEST};
-    std::vector<std::string> expected_program_names = {"sock_addr", "sockops", "bind", "xdp_test"};
+        EBPF_PROGRAM_TYPE_CGROUP_SOCK_ADDR, EBPF_PROGRAM_TYPE_SOCK_OPS, EBPF_PROGRAM_TYPE_BIND};
+    std::vector<std::string> expected_program_names = {"sock_addr", "sockops", "bind"};
 
     auto guid_less = [](const GUID& lhs, const GUID& rhs) { return memcmp(&lhs, &rhs, sizeof(lhs)) < 0; };
 
@@ -118,44 +115,6 @@ netebpfext_unit_invoke_xdp_program(
     }
 
     return return_result;
-}
-
-TEST_CASE("classify_packet", "[netebpfext]")
-{
-    NET_IFINDEX if_index = 0;
-    ebpf_extension_data_t npi_specific_characteristics = {
-        .header = EBPF_ATTACH_CLIENT_DATA_HEADER_VERSION,
-        .data = &if_index,
-        .data_size = sizeof(if_index),
-    };
-    test_xdp_client_context_header_t client_context_header = {0};
-    test_xdp_client_context_t* client_context = &client_context_header.context;
-    client_context->base.desired_attach_type = BPF_XDP_TEST;
-
-    netebpf_ext_helper_t helper(
-        &npi_specific_characteristics,
-        (_ebpf_extension_dispatch_function)netebpfext_unit_invoke_xdp_program,
-        (netebpfext_helper_base_client_context_t*)client_context);
-
-    // Classify an inbound packet that should pass.
-    client_context->xdp_action = XDP_TEST_ACTION_PASS;
-    FWP_ACTION_TYPE result = helper.classify_test_packet(&FWPM_LAYER_INBOUND_MAC_FRAME_NATIVE, if_index);
-    REQUIRE(result == FWP_ACTION_PERMIT);
-
-    // Classify an inbound packet that should be hairpinned.
-    client_context->xdp_action = XDP_TEST_ACTION_TX;
-    result = helper.classify_test_packet(&FWPM_LAYER_INBOUND_MAC_FRAME_NATIVE, if_index);
-    REQUIRE(result == FWP_ACTION_BLOCK);
-
-    // Classify an inbound packet that should be dropped.
-    client_context->xdp_action = XDP_TEST_ACTION_DROP;
-    result = helper.classify_test_packet(&FWPM_LAYER_INBOUND_MAC_FRAME_NATIVE, if_index);
-    REQUIRE(result == FWP_ACTION_BLOCK);
-
-    // Classify an inbound packet when eBPF program invocation failed.
-    client_context->xdp_action = XDP_TEST_ACTION_FAILURE;
-    result = helper.classify_test_packet(&FWPM_LAYER_INBOUND_MAC_FRAME_NATIVE, if_index);
-    REQUIRE(result == FWP_ACTION_BLOCK);
 }
 
 TEST_CASE("xdp_context", "[netebpfext]")

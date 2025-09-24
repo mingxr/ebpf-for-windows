@@ -21,9 +21,8 @@ Environment:
 #include "net_ebpf_ext_bind.h"
 #include "net_ebpf_ext_sock_addr.h"
 #include "net_ebpf_ext_sock_ops.h"
-#include "net_ebpf_ext_xdp.h"
 
-#define SECONDSTO100NS(x) ((x)*10000000)
+#define SECONDSTO100NS(x) ((x) * 10000000)
 #define SUBLAYER_WEIGHT_MAXIMUM 0xFFFF
 
 // Globals.
@@ -73,28 +72,6 @@ typedef struct _net_ebpf_ext_wfp_callout_state
 } net_ebpf_ext_wfp_callout_state_t;
 
 static net_ebpf_ext_wfp_callout_state_t _net_ebpf_ext_wfp_callout_states[] = {
-    // EBPF_HOOK_OUTBOUND_L2
-    {
-        &EBPF_HOOK_OUTBOUND_L2_CALLOUT,
-        &FWPM_LAYER_OUTBOUND_MAC_FRAME_NATIVE,
-        net_ebpf_ext_layer_2_classify,
-        net_ebpf_ext_filter_change_notify,
-        _net_ebpf_ext_flow_delete,
-        L"L2 Outbound",
-        L"L2 Outbound Callout for eBPF",
-        FWP_ACTION_CALLOUT_TERMINATING,
-    },
-    // EBPF_HOOK_INBOUND_L2
-    {
-        &EBPF_HOOK_INBOUND_L2_CALLOUT,
-        &FWPM_LAYER_INBOUND_MAC_FRAME_NATIVE,
-        net_ebpf_ext_layer_2_classify,
-        net_ebpf_ext_filter_change_notify,
-        _net_ebpf_ext_flow_delete,
-        L"L2 Inbound",
-        L"L2 Inbound Callout for eBPF",
-        FWP_ACTION_CALLOUT_TERMINATING,
-    },
     // EBPF_HOOK_ALE_RESOURCE_ALLOC_V4
     {
         &EBPF_HOOK_ALE_RESOURCE_ALLOC_V4_CALLOUT,
@@ -986,17 +963,6 @@ net_ebpf_ext_register_providers()
 
     NET_EBPF_EXT_LOG_ENTRY();
 
-    status = net_ebpf_ext_xdp_register_providers();
-    if (!NT_SUCCESS(status)) {
-        NET_EBPF_EXT_LOG_MESSAGE_NTSTATUS(
-            NET_EBPF_EXT_TRACELOG_LEVEL_ERROR,
-            NET_EBPF_EXT_TRACELOG_KEYWORD_EXTENSION,
-            "net_ebpf_ext_xdp_register_providers failed.",
-            status);
-        goto Exit;
-    }
-    _net_ebpf_xdp_providers_registered = true;
-
     status = net_ebpf_ext_bind_register_providers();
     if (!NT_SUCCESS(status)) {
         NET_EBPF_EXT_LOG_MESSAGE_NTSTATUS(
@@ -1042,10 +1008,6 @@ net_ebpf_ext_unregister_providers()
 {
     NET_EBPF_EXT_LOG_ENTRY();
 
-    if (_net_ebpf_xdp_providers_registered) {
-        net_ebpf_ext_xdp_unregister_providers();
-        _net_ebpf_xdp_providers_registered = false;
-    }
     if (_net_ebpf_bind_providers_registered) {
         net_ebpf_ext_bind_unregister_providers();
         _net_ebpf_bind_providers_registered = false;

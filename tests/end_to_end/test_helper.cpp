@@ -832,12 +832,6 @@ _test_helper_libbpf::initialize()
     REQUIRE(sample_program_info->initialize(EBPF_PROGRAM_TYPE_SAMPLE) == EBPF_SUCCESS);
     sample_hook = new single_instance_hook_t(EBPF_PROGRAM_TYPE_SAMPLE, EBPF_ATTACH_TYPE_SAMPLE, BPF_LINK_TYPE_PLAIN);
     REQUIRE(sample_hook->initialize() == EBPF_SUCCESS);
-
-    xdp_test_program_info = new program_info_provider_t();
-    REQUIRE(xdp_test_program_info->initialize(EBPF_PROGRAM_TYPE_XDP_TEST) == EBPF_SUCCESS);
-    xdp_test_hook =
-        new single_instance_hook_t(EBPF_PROGRAM_TYPE_XDP_TEST, EBPF_ATTACH_TYPE_XDP_TEST, BPF_LINK_TYPE_XDP);
-    REQUIRE(xdp_test_hook->initialize() == EBPF_SUCCESS);
 }
 
 _test_helper_libbpf::~_test_helper_libbpf()

@@ -247,16 +247,6 @@ enum bpf_prog_type
      */
     BPF_PROG_TYPE_PROCESS,
 
-    /** @brief Program type for handling incoming packets as early as possible.
-     *
-     * **eBPF program prototype:** \ref xdp_hook_t
-     *
-     * **Attach type(s):** \ref BPF_XDP_TEST
-     *
-     * **Helpers available:** all helpers defined in bpf_helpers.h
-     */
-    BPF_PROG_TYPE_XDP_TEST = 998,
-
     /** @brief Program type for handling calls from the eBPF sample extension. Used for
      * testing.
      *
@@ -341,23 +331,17 @@ enum bpf_attach_type
      */
     BPF_ATTACH_TYPE_SAMPLE,
 
-    /** @brief Attach type for handling incoming packets as early as possible.
-     *
-     * **Program type:** \ref BPF_PROG_TYPE_XDP_TEST
-     */
-    BPF_XDP_TEST,
-
     /** @brief Attach type for handling netevents.
      *
      * **Program type:** \ref BPF_PROG_TYPE_NETEVENT
      */
-    BPF_ATTACH_TYPE_NETEVENT,
+    BPF_ATTACH_TYPE_NETEVENT = 10,
 
     /** @brief Attach type for handling process creation/deletion events.
      *
      * **Program type:** \ref BPF_PROG_TYPE_PROCESS
      */
-    BPF_ATTACH_TYPE_PROCESS,
+    BPF_ATTACH_TYPE_PROCESS = 11,
 
     __MAX_BPF_ATTACH_TYPE,
 };

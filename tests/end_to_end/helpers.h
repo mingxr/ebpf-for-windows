@@ -739,6 +739,7 @@ static const ebpf_program_type_descriptor_t _mock_xdp_program_type_descriptor = 
     EBPF_PROGRAM_TYPE_XDP_GUID,
     BPF_PROG_TYPE_XDP,
     0};
+
 static const ebpf_program_info_t _mock_xdp_program_info = {
     EBPF_PROGRAM_INFORMATION_HEADER,
     &_mock_xdp_program_type_descriptor,
@@ -748,18 +749,6 @@ static const ebpf_program_info_t _mock_xdp_program_info = {
 static ebpf_program_data_t _mock_xdp_program_data = {
     EBPF_PROGRAM_DATA_HEADER,
     &_mock_xdp_program_info,
-    &_mock_xdp_helper_function_address_table,
-    nullptr,
-    _xdp_context_create,
-    _xdp_context_destroy,
-    0,
-    {0},
-};
-
-// XDP_TEST.
-static ebpf_program_data_t _ebpf_xdp_test_program_data = {
-    EBPF_PROGRAM_DATA_HEADER,
-    &_ebpf_xdp_test_program_info,
     &_mock_xdp_helper_function_address_table,
     nullptr,
     _xdp_context_create,
@@ -1156,8 +1145,6 @@ typedef class _program_info_provider
             program_data = custom_program_data;
         } else if (program_type == EBPF_PROGRAM_TYPE_XDP) {
             program_data = &_mock_xdp_program_data;
-        } else if (program_type == EBPF_PROGRAM_TYPE_XDP_TEST) {
-            program_data = &_ebpf_xdp_test_program_data;
         } else if (program_type == EBPF_PROGRAM_TYPE_BIND) {
             program_data = &_ebpf_bind_program_data;
         } else if (program_type == EBPF_PROGRAM_TYPE_CGROUP_SOCK_ADDR) {
